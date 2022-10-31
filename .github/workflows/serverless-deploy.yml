@@ -1,0 +1,48 @@
+name: Serverless Deploy
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
+      node-version:
+        default: 16.0.0
+        type: number
+      prod-branch:
+        default: "refs/heads/main"
+        type: string
+      stage-branch:
+        default: "refs/heads/stage"
+        type: string
+      debug:
+        default: 0
+        type: number
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{inputs.node-version}}
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{inputs.python-version}}
+      - name: setup serverless for prod
+        if: github.ref == ${{inputs.prod-branch}}
+        run: mv serverless-prod.yml serverless.yml
+      - name: setup serverless for stage
+        if: github.ref == ${{inputs.stage-branch}}
+        run: mv serverless-stage.yml serverless.yml
+      - name: install serverless
+        run: |
+          npm install -g serverless
+          npm install serverless-python-requirements
+      - name: serverless deploy
+        run: serverless deploy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SLS_DEBUG: ${{inputs.debug}}
