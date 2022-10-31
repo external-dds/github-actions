@@ -1,0 +1,26 @@
+name: Run Pytest
+on:
+  workflow_dispatch:
+  workflow_call:
+env:
+  python-version: "3.9"
+  pyright: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: $python-version
+      - name: Install dependencies
+        run: |
+          pip install boto3 pytest pyright
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Lint with pyright
+        run: pyright
+      - name: Test with pytest
+        run: pytest -m "not integration"
