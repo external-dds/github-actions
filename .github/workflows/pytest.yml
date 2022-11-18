@@ -6,7 +6,7 @@ on:
         required: true
         type: string
       mysql-version:
-        default: "5.7"
+        default: ""
         type: string
       postgres: # todo
         default: false
@@ -48,6 +48,6 @@ jobs:
           MYSQL_DATABASE: test
           MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
         run: |
-          docker run mysql:${{inputs.mysql-version}} -p 3600:3600 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_DATABASE=test -uroot
+          docker run -p 3600:3600 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_DATABASE=test -uroot mysql:${{inputs.mysql-version}}
       - name: Test with pytest
         run: pytest -m "not integration"
