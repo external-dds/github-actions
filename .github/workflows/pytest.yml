@@ -36,10 +36,12 @@ jobs:
           pip install boto3 pytest
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: check mysql version
-        run: echo ${{mysql-version}}
+        run: |
+          echo "mysql version: $mysql-version"
       - name: wants mysql
         if: ${{inputs.mysql-version}}
-        run: echo should run mysql
+        run: |
+          echo "should run mysql"
       - name: Setup MySQL DB
         if: ${{inputs.mysql-version}}
         env:
