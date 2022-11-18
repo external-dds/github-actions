@@ -5,9 +5,9 @@ on:
       python-version:
         required: true
         type: string
-      mysql:
-        default: false
-        type: boolean
+      mysql-version:
+        default: 0
+        type: number
       postgres: # todo
         default: false
         type: boolean
@@ -35,12 +35,17 @@ jobs:
         run: |
           pip install boto3 pytest
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: check mysql version
+        run: echo ${{mysql-version}}
+      - name: wants mysql
+        if: ${{inputs.mysql-version}}
+        run: echo should run mysql
       - name: Setup MySQL DB
-        if: ${{inputs.mysql}}
+        if: ${{inputs.mysql-version}}
         env:
           MYSQL_DATABASE: test
           MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
         run: |
-          docker run mysql:5.7 -p 3600:3600 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_DATABASE=test -uroot
+          docker run mysql:${{inputs.mysql-version}} -p 3600:3600 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_DATABASE=test -uroot
       - name: Test with pytest
         run: pytest -m "not integration"
