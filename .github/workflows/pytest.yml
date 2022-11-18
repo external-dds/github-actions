@@ -44,10 +44,20 @@ jobs:
           echo "should run mysql"
       - name: Setup MySQL DB
         if: ${{inputs.mysql-version}}
-        env:
-          MYSQL_DATABASE: test
-          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
         run: |
-          docker run -d -p 3600:3600 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_DATABASE=test --health-cmd="mysqladmin ping -h mysql -u root" --health-interval=20s --health-timeout=5s --health-retries=3 mysql:${{inputs.mysql-version}}
+          mysql -uroot -h127.0.0.1 -e 'SELECT version()'
+      # - name: Setup MySQL DB
+      #   if: ${{inputs.mysql-version}}
+      #   run: |
+      #     sudo /etc/init.d/mysql start
+      #     mysql -e 'CREATE DATABASE test;' -uroot --skip-password
+      #     mysql -e 'SHOW DATABASES;' -uroot --skip-password
+      # - name: Setup MySQL DB
+      #   if: ${{inputs.mysql-version}}
+      #   env:
+      #     MYSQL_DATABASE: test
+      #     MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      #   run: |
+      #     docker run -d -p 3600:3600 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_DATABASE=test --health-cmd="mysqladmin ping -h mysql -u root" --health-interval=20s --health-timeout=5s --health-retries=3 mysql:${{inputs.mysql-version}}
       - name: Test with pytest
         run: pytest -m "not integration"
