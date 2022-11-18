@@ -5,6 +5,9 @@ on:
       python-version:
         required: true
         type: string
+      pyright:
+        default: true
+        type: boolean
       mysql-version:
         default: ""
         type: string
@@ -66,6 +69,11 @@ jobs:
       #     MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       #   run: |
       #     docker run -d -p 3600:3600 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_DATABASE=test --health-cmd="mysqladmin ping -h mysql -u root" --health-interval=20s --health-timeout=5s --health-retries=3 mysql:${{inputs.mysql-version}}
+      - name: Lint with pyright
+        if: ${{inputs.pyright}}
+        run: |
+          pip install pyright
+          pyright
       - name: Test with pytest
         run: pytest -m "not integration"
         env:
