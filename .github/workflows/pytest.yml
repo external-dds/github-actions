@@ -6,8 +6,8 @@ on:
         required: true
         type: string
       mysql-version:
-        default: 0
-        type: number
+        default: "5.7"
+        type: string
       postgres: # todo
         default: false
         type: boolean
