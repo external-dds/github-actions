@@ -5,11 +5,25 @@ on:
       python-version:
         required: true
         type: string
-
+      mysql:
+        default: false
+        type: boolean
+      postgres: # todo
+        default: false
+        type: boolean
 jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # services:
+    #   mysql:
+    #     image: mysql:5.7
+    #     env:
+    #       MYSQL_DATABASE: test
+    #       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    #     ports:
+    #       - 3306:3306
+    #     options: --health-cmd="mysqladmin ping -h mysql -u root" --health-interval=20s --health-timeout=5s --health-retries=3
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -21,5 +35,12 @@ jobs:
         run: |
           pip install boto3 pytest
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Setup MySQL DB
+        if: ${{inputs.mysql}}
+        env:
+          MYSQL_DATABASE: test
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+        run: |
+          docker run mysql:5.7 -p 3600:3600 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_DATABASE=test -uroot
       - name: Test with pytest
         run: pytest -m "not integration"
