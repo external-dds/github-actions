@@ -48,6 +48,6 @@ jobs:
           MYSQL_DATABASE: test
           MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
         run: |
-          docker run -p 3600:3600 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_DATABASE=test -uroot mysql:${{inputs.mysql-version}}
+          docker run -d -p 3600:3600 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_DATABASE=test --health-cmd="mysqladmin ping -h mysql -u root" --health-interval=20s --health-timeout=5s --health-retries=3 mysql:${{inputs.mysql-version}}
       - name: Test with pytest
         run: pytest -m "not integration"
